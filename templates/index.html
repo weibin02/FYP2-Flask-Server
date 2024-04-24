@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <!-- jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <title>Product Quality Grading System</title>
+    <style>
+    .svg-background {
+        background-image: url("data:image/svg+xml,%3Csvg id='wave' style='transform:rotate(180deg); transition: 0.3s' viewBox='0 0 1440 490' version='1.1' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3ClinearGradient id='sw-gradient-0' x1='0' x2='0' y1='1' y2='0'%3E%3Cstop stop-color='rgba(42, 104, 117, 1)' offset='0%25'%3E%3C/stop%3E%3Cstop stop-color='rgba(42, 104, 117, 1)' offset='100%25'%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath style='transform:translate(0, 0px); opacity:1' fill='url(%23sw-gradient-0)' d='M0,441L1440,49L2880,147L4320,392L5760,98L7200,147L8640,245L10080,343L11520,0L12960,441L14400,0L15840,98L17280,245L18720,294L20160,245L21600,441L23040,392L24480,245L25920,196L27360,0L28800,0L30240,294L31680,147L33120,294L34560,49L34560,490L33120,490L31680,490L30240,490L28800,490L27360,490L25920,490L24480,490L23040,490L21600,490L20160,490L18720,490L17280,490L15840,490L14400,490L12960,490L11520,490L10080,490L8640,490L7200,490L5760,490L4320,490L2880,490L1440,490L0,490Z'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+    }
+
+    .form-label {
+        margin-bottom: 0px;
+        margin-top: 0.5rem;
+    }
+
+    p {
+        margin-bottom: 0rem;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid svg-background h-100 p-2">
+        <div class="row mt-0" style="--bs-gutter-y: -0.5rem;">
+            <div class="col-2 text-center pt-3" style="background-color: #000000;">
+                <h3 style="color: #e7e7e7; font-weight: normal;">Prediction History</h3>
+                <div id="historySlider" class="d-flex flex-column mt-5 gap-4 overflow-auto" style="max-height: 100vh; background-color: #121212;">
+                </div>
+            </div>
+            <div class="col">
+                <div class="container shadow rounded bg-white p-5 my-5">
+                    <h1 class="display-4 mb-5">Product Quality Grading System</h1>
+
+                    <!-- Main Input For Receiving Query to our ML -->
+                    <!-- action="{{ url_for('predict')}}" method="post" -->
+                    <form action="{{ url_for('predict')}}" method="post" id="myForm">
+                    <div class="container">
+                        <div class="row gap-5 mb-5">
+                            <div class="col rounded p-3" style="background-color: rgb(223, 234, 242);">
+                                <h2>Defect 1<span class="text-danger"> *</span></h2>
+                                <p style="font-size:20px; margin-bottom: -1rem;">Location:</p>
+
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label for="def1_loc_len" class="form-label">Length: </label>
+                                        <select id="def1_loc_len" name="def1_loc_len" class="form-select myInputs">
+                                            <option value="H">H - From 1/5 Front (Head)</option>
+                                            <option value="U">U - From 2/5 Front</option>
+                                            <option value="M">M - Middle of Full Length</option>
+                                            <option value="V">V - From 4/5 Front</option>
+                                            <option value="T">T - End 1/5 of Full Length</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def1_loc_width" class="form-label">Width: </label>
+                                        <select id="def1_loc_width" name="def1_loc_width" class="form-select myInputs">
+                                            <option value="W">W - Work Side</option>
+                                            <option value="X">X - Work Side to Center</option>
+                                            <option value="C">C - Center Side</option>
+                                            <option value="Y">Y - Drive Side to Center</option>
+                                            <option value="D">D - Drive Side</option>
+                                            <option value="A">A - Work Side and Drive Side</option>
+                                            <option value="F">F - Full Surface</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def1_loc_height" class="form-label">Height: </label>
+                                        <select id="def1_loc_height" name="def1_loc_height" class="form-select myInputs">
+                                            <option value="T">T - Top Surface</option>
+                                            <option value="B">B - Bottom Surface</option>
+                                            <option value="D">D - Double Surface</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label for="def1_rate" class="form-label">Rate:</label>
+                                <select id="def1_rate" name="def1_rate" class="form-select myInputs">
+                                    <option value="0">L - Light</option>
+                                    <option value="1">M - Medium</option>
+                                    <option value="2">H - Heavy</option>
+                                </select>
+
+                                <label for="def1_area" class="form-label">Area (%):</label>
+                                <input id="def1_area" type="text" inputmode="decimal" name="def1_area" required="required" class="form-control myInputs"
+                                    placeholder="0 - 100" min="0" max="100"/>
+                            </div>
+
+                            <div class="col rounded p-3" style="background-color: rgb(228, 233, 237);">
+                                <h2>Defect 2<span class="text-danger"> *</span></h2>
+                                <p style="font-size:20px; margin-bottom: -1rem;">Location:</p>
+
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label for="def2_loc_len" class="form-label">Length: </label>
+                                        <select id="def2_loc_len" name="def2_loc_len" class="form-select myInputs">
+                                            <option value="H">H - From 1/5 Front (Head)</option>
+                                            <option value="U">U - From 2/5 Front</option>
+                                            <option value="M">M - Middle of Full Length</option>
+                                            <option value="V">V - From 4/5 Front</option>
+                                            <option value="T">T - End 1/5 of Full Length</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def2_loc_width" class="form-label">Width: </label>
+                                        <select id="def2_loc_width" name="def2_loc_width" class="form-select myInputs">
+                                            <option value="W">W - Work Side</option>
+                                            <option value="X">X - Work Side to Center</option>
+                                            <option value="C">C - Center Side</option>
+                                            <option value="Y">Y - Drive Side to Center</option>
+                                            <option value="D">D - Drive Side</option>
+                                            <option value="A">A - Work Side and Drive Side</option>
+                                            <option value="F">F - Full Surface</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def2_loc_height" class="form-label">Height: </label>
+                                        <select id="def2_loc_height" name="def2_loc_height" class="form-select myInputs">
+                                            <option value="T">T - Top Surface</option>
+                                            <option value="B">B - Bottom Surface</option>
+                                            <option value="D">D - Double Surface</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label for="def2_rate" class="form-label">Rate:</label>
+                                <select id="def2_rate" name="def2_rate" class="form-select myInputs">
+                                    <option value="0">L - Light</option>
+                                    <option value="1">M - Medium</option>
+                                    <option value="2">H - Heavy</option>
+                                </select>
+
+                                <label for="def2_area" class="form-label">Area (%):</label>
+                                <input id="def2_area" type="text" inputmode="decimal" name="def2_area" required="required" class="form-control myInputs"
+                                    placeholder="0 - 100" min="0" max="100"/>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex flex-column justify-content-center align-items-stretch gap-3 h-100">
+                                    <button type="submit" class="btn btn-primary btn-lg">Predict</button>
+                                    <button type="button" class="btn btn-secondary btn-lg" disabled>Product Quality: {{ prediction_text }}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row gap-5">
+                            <div class="col rounded py-3" style="background-color: rgb(228, 233, 237);">
+                                <h2>Defect 3<span class="text-danger"> *</span></h2>
+                                <p style="font-size:20px; margin-bottom: -1rem;">Location:</p>
+
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label for="def3_loc_len" class="form-label">Length: </label>
+                                        <select id="def3_loc_len" name="def3_loc_len" class="form-select myInputs">
+                                            <option value="H">H - From 1/5 Front (Head)</option>
+                                            <option value="U">U - From 2/5 Front</option>
+                                            <option value="M">M - Middle of Full Length</option>
+                                            <option value="V">V - From 4/5 Front</option>
+                                            <option value="T">T - End 1/5 of Full Length</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def3_loc_width" class="form-label">Width: </label>
+                                        <select id="def3_loc_width" name="def3_loc_width" class="form-select myInputs">
+                                            <option value="W">W - Work Side</option>
+                                            <option value="X">X - Work Side to Center</option>
+                                            <option value="C">C - Center Side</option>
+                                            <option value="Y">Y - Drive Side to Center</option>
+                                            <option value="D">D - Drive Side</option>
+                                            <option value="A">A - Work Side and Drive Side</option>
+                                            <option value="F">F - Full Surface</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def3_loc_height" class="form-label">Height: </label>
+                                        <select id="def3_loc_height" name="def3_loc_height" class="form-select myInputs">
+                                            <option value="T">T - Top Surface</option>
+                                            <option value="B">B - Bottom Surface</option>
+                                            <option value="D">D - Double Surface</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <label for="def3_rate" class="form-label">Rate:</label>
+                                <select id="def3_rate" name="def3_rate" class="form-select myInputs">
+                                    <option value="0">L - Light</option>
+                                    <option value="1">M - Medium</option>
+                                    <option value="2">H - Heavy</option>
+                                </select>
+                                <label for="def3_area" class="form-label">Area (%):</label>
+                                <input id="def3_area" type="text" inputmode="decimal" name="def3_area" required="required" class="form-control myInputs"
+                                    placeholder="0 - 100" min="0" max="100"/>
+                            </div>
+                            <div class="col rounded py-3" style="background-color: rgb(223,234,242);">
+                                <h2>Defect 4<span class="text-danger"> *</span></h2>
+                                <p style="font-size:20px; margin-bottom: -1rem;">Location:</p>
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label for="def4_loc_len" class="form-label">Length: </label>
+                                        <select id="def4_loc_len" name="def4_loc_len" class="form-select myInputs">
+                                            <option value="H">H - From 1/5 Front (Head)</option>
+                                            <option value="U">U - From 2/5 Front</option>
+                                            <option value="M">M - Middle of Full Length</option>
+                                            <option value="V">V - From 4/5 Front</option>
+                                            <option value="T">T - End 1/5 of Full Length</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="def4_loc_width" class="form-label">Width: </label>
+                                        <select id="def4_loc_width" name="def4_loc_width" class="form-select myInputs">
+                                            <option value="W">W - Work Side</option>
+                                            <option value="X">X - Work Side to Center</option>
+                                            <option value="C">C - Center Side</option>
+                                            <option value="Y">Y - Drive Side to Center</option>
+                                            <option value="D">D - Drive Side</option>
+                                            <option value="A">A - Work Side and Drive Side</option>
+                                            <option value="F">F - Full Surface</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label for="def4_loc_height" class="form-label">Height: </label>
+                                        <select id="def4_loc_height" name="def4_loc_height" class="form-select myInputs">
+                                            <option value="T">T - Top Surface</option>
+                                            <option value="B">B - Bottom Surface</option>
+                                            <option value="D">D - Double Surface</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label for="def4_rate" class="form-label">Rate:</label>
+                                <select id="def4_rate" name="def4_rate" class="form-select myInputs">
+                                    <option value="0">L - Light</option>
+                                    <option value="1">M - Medium</option>
+                                    <option value="2">H - Heavy</option>
+                                </select>
+
+                                <label for="def4_area" class="form-label">Area (%):</label>
+                                <input id="def4_area" type="text" inputmode="decimal" name="def4_area" required="required" class="form-control myInputs"
+                                    placeholder="0 - 100" min="0" max="100"/>
+                            </div>
+
+                            <div class="col rounded py-3" style="background-color: rgb(228, 233, 237);">
+                                <h2>Defect 5<span class="text-danger"> *</span></h2>
+                                <p style="font-size:20px; margin-bottom: -1rem;">Location:</p>
+
+                                <div class="d-flex gap-2">
+                                    <div>
+                                        <label for="def5_loc_len" class="form-label">Length: </label>
+                                        <select id="def5_loc_len" name="def5_loc_len" class="form-select myInputs">
+                                            <option value="H">H - From 1/5 Front (Head)</option>
+                                            <option value="U">U - From 2/5 Front</option>
+                                            <option value="M">M - Middle of Full Length</option>
+                                            <option value="V">V - From 4/5 Front</option>
+                                            <option value="T">T - End 1/5 of Full Length</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def5_loc_width" class="form-label">Width: </label>
+                                        <select id="def5_loc_width" name="def5_loc_width" class="form-select myInputs">
+                                            <option value="W">W - Work Side</option>
+                                            <option value="X">X - Work Side to Center</option>
+                                            <option value="C">C - Center Side</option>
+                                            <option value="Y">Y - Drive Side to Center</option>
+                                            <option value="D">D - Drive Side</option>
+                                            <option value="A">A - Work Side and Drive Side</option>
+                                            <option value="F">F - Full Surface</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="def5_loc_height" class="form-label">Height: </label>
+                                        <select id="def5_loc_height" name="def5_loc_height" class="form-select myInputs">
+                                            <option value="T">T - Top Surface</option>
+                                            <option value="B">B - Bottom Surface</option>
+                                            <option value="D">D - Double Surface</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label for="def5_rate" class="form-label">Rate:</label>
+                                <select id="def5_rate" name="def5_rate" class="form-select myInputs">
+                                    <option value="0">L - Light</option>
+                                    <option value="1">M - Medium</option>
+                                    <option value="2">H - Heavy</option>
+                                </select>
+
+                                <label for="def5_area" class="form-label">Area (%):</label>
+                                <input id="def5_area" type="text" inputmode="decimal" name="def5_area" required="required" class="form-control myInputs"
+                                    placeholder="0 - 100" min="0" max="100"/>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    // To reset the cookie
+    // document.cookie = "predictionHistory=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+
+    var predictionHistory = getCookie("predictionHistory");
+    console.log(predictionHistory);
+
+    $("#myForm").on("submit", function(e) {
+        var inputValues = predictionHistory ? predictionHistory : [];
+        if ("{{ prediction_text }}"){
+            inputValues.push("{{ prediction_text }}");
+        }
+
+        var myFormInputs = $(".myInputs")
+        for (let i = 0; i < myFormInputs.length; i++) {
+            inputValues.push(myFormInputs[i].value);
+        }
+
+        let data = { "history": [inputValues] };
+        document.cookie = "predictionHistory=" + data.history;
+    });
+
+    function getCookie(name) {
+        let cookie = {};
+        document.cookie.split(';').forEach(function(el) {
+            let [k,v] = el.split('=');
+            cookie[k.trim()] = v;
+        })
+        return cookie[name];
+    }
+
+    $(document).ready(function() {
+        if (predictionHistory) {
+            predictionHistory = predictionHistory.split(",");
+
+            var html = "";
+            var count = 1;
+            for (let i = 0; i < predictionHistory.length - 25;){
+                html += '<div>' +
+                            '<h4 class="text-start" style="color: #e7e7e7; font-weight: normal;">#' + count++ + '</h4>' +
+                            '<div class="overflow-auto text-start" style="max-height: 15rem; background-color: #1e1e1e;">';
+
+                for (let j = 1; j < 6; j++){
+                    html += '<p style="color: #dddddd; font-size: 1.5rem;">Defect ' + j + '</p>' +
+                                '<div class="row w-100">' +
+                                    '<div class="col">' +
+                                        '<p style="color: #797979;">Length</p>' +
+                                        '<p style="color: #797979;">Width</p>' +
+                                        '<p style="color: #797979;">Height</p>' +
+                                        '<p style="color: #797979;">Rate</p>' +
+                                        '<p style="color: #797979;">Area</p>' +
+                                    '</div>' +
+                                    '<div class="col text-start">'+
+                                        '<p style="color: #dddddd;">'+predictionHistory[i++]+'</p>'+
+                                        '<p style="color: #dddddd;">'+predictionHistory[i++]+'</p>'+
+                                        '<p style="color: #dddddd;">'+predictionHistory[i++]+'</p>'+
+                                        '<p style="color: #dddddd;">'+predictionHistory[i++]+'</p>'+
+                                        '<p style="color: #dddddd;">'+predictionHistory[i++]+'</p>'+
+                                    '</div>'+
+                                '</div>';
+                }
+                html += '</div><p class="text-start" style="color: #dddddd; font-size: 1.5rem;">Product Quality: ';
+                if (i == predictionHistory.length){
+                    html += '-'
+                }
+                else {
+                    html += predictionHistory[i++]
+                }
+                html += '</p></div>';
+            }
+
+            $("#historySlider").append(html);
+        }
+    });
+</script>
+</body>
+</html>
